@@ -1,4 +1,13 @@
 class UsersController < ApplicationController
+  validates :index do
+    integer :page, description: 'Parameter for pagination.'
+    integer :per_page, description: 'Parameter for pagination.'
+  end
+
+  validates :update do
+    string :name, required: true, description: "Arbitrary name for user. It's not restricted to be unique."
+  end
+
   include Garage::RestfulActions
 
   def require_resources
@@ -15,5 +24,9 @@ class UsersController < ApplicationController
 
   def user_params
     params.permit(:name)
+  end
+
+  def respond_with_resources_options
+    { paginate: true }
   end
 end
