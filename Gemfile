@@ -45,6 +45,7 @@ group :development, :test do
   gem 'pry-rails'
   gem 'rspec-rails'
   gem 'autodoc'
+  gem 'debug_exceptions_json'
 end
 
 gem 'weak_parameters'
