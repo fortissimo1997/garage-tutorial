@@ -3,19 +3,43 @@ require 'rails_helper'
 RSpec.describe 'users', type: :request do
   include RequestHelper
 
+  let(:user_structure) do
+    {
+     'id' => a_kind_of(Integer),
+     'name' => a_kind_of(String),
+     'email' => a_kind_of(String),
+     '_links' => {
+                  'posts' => {
+                              'href' => a_string_matching(%r(/v1/users/\d+/posts))
+                             }
+                 }
+    }
+  end
+
   describe 'GET /v1/users' do
     let!(:users) { create_list(:user, 3) }
 
-    it 'returns user resources' do
+    it 'returns user resources', autodoc: true do
       get '/v1/users', params, env
       expect(response).to have_http_status(200)
+      expect(JSON(response.body)).to all(match(user_structure))
+    end
+  end
+
+  describe 'GET /v1/users/:user_id' do
+    let!(:user) { create(:user, name: 'alice') }
+
+    it 'returns user resource', autodoc: true do
+      get "/v1/users/#{user.id}", params, env
+      expect(response).to have_http_status(200)
+      expect(JSON(response.body)).to match(user_structure)
     end
   end
 
   describe 'PUT /v1/users/:user_id' do
     before { params[:name] = 'bob' }
 
-    context 'with owned resource' do
+    context 'with owned resource', autodoc: true do
       let!(:user) { resource_owner }
 
       it 'updates owned resource' do
@@ -24,7 +48,7 @@ RSpec.describe 'users', type: :request do
       end
     end
 
-    context 'without owned resource' do
+    context 'without owned resource', autodoc: true do
       let!(:other) { create(:user, name: 'raymonde') }
 
       it 'returns 403' do
