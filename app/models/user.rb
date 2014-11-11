@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
   property :id
   property :name
   property :email
+  link(:posts) { user_posts_path(self) }
 
   def self.build_permissions(perms, other, target)
     perms.permits! :read
